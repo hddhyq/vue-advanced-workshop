@@ -5,9 +5,35 @@
 </div>
 
 <script>
-Vue.component('example', {
-  // Implement this!
-})
+  // Vue.component('example', {
+  //   props: ['tags'],
+  //   render(h, context) {
+  //     // context.solts(); // this.$solts context.parent
+  //     const { tags } = context.props.tags;
+  //     return h('div', tags.map((tag, index) => h(tag, index)))
+  //   }
+  // })
+  Vue.component('example', {
+    props: ['tags'],
+    render(h, context) {
+      // context.solts(); // this.$solts context.parent
+      const { tags } = context.props.tags
+      return h('div', tags.map((tag, index) => h(tag, index)))
+    }
+  })
 
-new Vue({ el: '#app' })
+  //  1
+  const Example = {
+    functional: true,
+    render(h, context) {
+      const { tags } = context.props.tags
+      return <div>{tags.map((tag, index) => h(tag, index))}</div>
+    }
+  } // use babel transform JSX
+
+  // 2
+  const Example = (h, { props: { tags } }) => (
+    <div>{tags.map((tag, index) => h(tag, index))}</div>
+  )
+  new Vue({ el: '#app' })
 </script>
