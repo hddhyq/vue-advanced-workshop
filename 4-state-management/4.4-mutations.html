@@ -8,32 +8,41 @@
 </div>
 
 <script>
-function createStore ({ state, mutations }) {
-  // Implement this!
-}
+  function createStore({ state, mutations }) {
+    return new Vue({
+      data() {
+        return { state }
+      },
+      methods: {
+        commit(mutationType) {
+          return mutations[mutationType](this.state)
+        }
+      }
+    })
+  }
 
-const store = createStore({
-  state: { count: 0 },
-  mutations: {
-    inc (state) {
-      state.count++
+  const store = createStore({
+    state: { count: 0 },
+    mutations: {
+      inc(state) {
+        state.count++
+      }
+    }
+  })
+
+  const Counter = {
+    render(h) {
+      return h('div', store.state.count)
     }
   }
-})
 
-const Counter = {
-  render (h) {
-    return h('div', store.state.count)
-  }
-}
-
-new Vue({
-  el: '#app',
-  components: { Counter },
-  methods: {
-    inc () {
-      store.commit('inc')
+  new Vue({
+    el: '#app',
+    components: { Counter },
+    methods: {
+      inc() {
+        store.commit('inc')
+      }
     }
-  }
-})
+  })
 </script>
