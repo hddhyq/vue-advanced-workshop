@@ -45,28 +45,32 @@
     app.url = window.location.hash.slice(1);
   });
 
+  console.log(compiledRoutes);
+
   const app = new Vue({
     el: '#app',
     data: {
       url: window.location.hash.slice(1)
     },
     render(h) {
-      const path = '/' + this.url;
+      const path = this.url;
 
       let componentToRender = NotFound;
       let props = {};
 
       compiledRoutes.some(route => {
-        return (match = route.regex.exec(path));
+        console.log(route.regex);
+        const match = route.regex.exec(path);
+        console.log(match);
         if (match) {
           componentToRender = route.component;
-          route.dynamicSegments.forEach(segment => {
+          route.dynamicSegments.forEach((segment, index) => {
             props[segment.name] = match[index + 1];
           });
+          return true;
         }
       });
 
-      Object.keys(routeTable).forEach(key => {});
       // Implement the logic to figure out proper values
       // for componentToRender and props
 
