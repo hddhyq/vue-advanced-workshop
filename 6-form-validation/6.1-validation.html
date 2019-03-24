@@ -2,9 +2,9 @@
 
 <div id="app">
   <form @submit="validate">
-    <input v-model="text">
-    <br>
-    <input v-model="email">
+    <input v-model="text" />
+    <br />
+    <input v-model="email" />
 
     <ul v-if="!$v.valid" style="color:red">
       <li v-for="error in $v.errors">
@@ -12,42 +12,69 @@
       </li>
     </ul>
 
-    <input type="submit" :disabled="!$v.valid">
+    <input type="submit" :disabled="!$v.valid" />
   </form>
 </div>
 
 <script>
-const validationPlugin = {
-  // Implement this!
-}
+  const validationPlugin = {
+    install(Vue) {
+      Vue.mixin({
+        computed: {
+          $v() {
+            let valid = true;
+            const errors = [];
+            const rules = this.$options.validations;
 
-Vue.use(validationPlugin)
+            Object.keys(rules || {}).forEach(key => {
+              const rule = rules[key];
+              const value = this[key];
 
-const emailRE = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+              const result = rule.validate(value);
 
-new Vue({
-  el: '#app',
-  data: {
-    text: 'foo',
-    email: ''
-  },
-  validations: {
-    text: {
-      validate: value => value.length >= 5,
-      message: (key, value) => `${key} should have a min length of 5, but got ${value.length}`
-    },
-    email: {
-      validate: value => emailRE.test(value),
-      message: key => `${key} must be a valid email`
+              if (!result) {
+                valid = false;
+                errors.push(rule.message(key, value));
+              }
+            });
+            return {
+              valid,
+              errors
+            };
+          }
+        }
+      });
     }
-  },
-  methods: {
-    validate (e) {
-      if (!this.$v.valid) {
-        e.preventDefault()
-        alert('not valid!')
+  };
+
+  Vue.use(validationPlugin);
+
+  const emailRE = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+  new Vue({
+    el: '#app',
+    data: {
+      text: 'foo',
+      email: ''
+    },
+    validations: {
+      text: {
+        validate: value => value.length >= 5,
+        message: (key, value) =>
+          `${key} should have a min length of 5, but got ${value.length}`
+      },
+      email: {
+        validate: value => emailRE.test(value),
+        message: key => `${key} must be a valid email`
+      }
+    },
+    methods: {
+      validate(e) {
+        if (!this.$v.valid) {
+          e.preventDefault();
+          alert('not valid!');
+        }
       }
     }
-  }
-})
+  });
 </script>
